@@ -1,94 +1,60 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { MdAddShoppingCart } from 'react-icons/md';
+import { connect } from 'react-redux';
 import { ProductList } from './styles';
+import api from '../../services/api';
+import { formatPrice } from '../../util/format';
 
-export default function Home() {
-  return (
-    <ProductList>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-adidas-alphabounce-instinct-masculino/93/COL-9739-793/COL-9739-793_zoom1.jpg?ims=120x"
-          alt="Tenis"
-        />
-        <strong>Tenis muito legal</strong>
-        <span>R$ 129.90</span>
-        <button type="button">
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" /> 3
-          </div>
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-adidas-alphabounce-instinct-masculino/93/COL-9739-793/COL-9739-793_zoom1.jpg?ims=120x"
-          alt="Tenis"
-        />
-        <strong>Tenis muito legal</strong>
-        <span>R$ 129.90</span>
-        <button type="button">
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" /> 3
-          </div>
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-adidas-alphabounce-instinct-masculino/93/COL-9739-793/COL-9739-793_zoom1.jpg?ims=120x"
-          alt="Tenis"
-        />
-        <strong>Tenis muito legal</strong>
-        <span>R$ 129.90</span>
-        <button type="button">
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" /> 3
-          </div>
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-adidas-alphabounce-instinct-masculino/93/COL-9739-793/COL-9739-793_zoom1.jpg?ims=120x"
-          alt="Tenis"
-        />
-        <strong>Tenis muito legal</strong>
-        <span>R$ 129.90</span>
-        <button type="button">
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" /> 3
-          </div>
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-adidas-alphabounce-instinct-masculino/93/COL-9739-793/COL-9739-793_zoom1.jpg?ims=120x"
-          alt="Tenis"
-        />
-        <strong>Tenis muito legal</strong>
-        <span>R$ 129.90</span>
-        <button type="button">
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" /> 3
-          </div>
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-adidas-alphabounce-instinct-masculino/93/COL-9739-793/COL-9739-793_zoom1.jpg?ims=120x"
-          alt="Tenis"
-        />
-        <strong>Tenis muito legal</strong>
-        <span>R$ 129.90</span>
-        <button type="button">
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" /> 3
-          </div>
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-    </ProductList>
-  );
+class Home extends Component {
+  state = {
+    products: [],
+  };
+
+  async componentDidMount() {
+    const response = await api.get('products');
+
+    const data = response.data.map(product => ({
+      ...product,
+      priceFormatted: formatPrice(product.price),
+    }));
+
+    this.setState({ products: data });
+  }
+
+  handleAddProduct = product => {
+    // dispatch server para disparar acoes no redux
+    const { dispatch } = this.props;
+
+    dispatch({
+      type: 'ADD_TO_CART',
+      product,
+    });
+  };
+
+  render() {
+    const { products } = this.state;
+    return (
+      <ProductList>
+        {products.map(product => (
+          <li key={product.id}>
+            {/* //sempre que fizer um map no li precisa do key como id do elemento */}
+            <img src={product.image} alt={product.title} />
+            <strong>{product.title}</strong>
+            <span>{product.priceFormatted}</span>
+            <button
+              type="button"
+              onClick={() => this.handleAddProduct(product)}
+            >
+              <div>
+                <MdAddShoppingCart size={16} color="#FFF" /> 3
+              </div>
+              <span>ADICIONAR AO CARRINHO</span>
+            </button>
+          </li>
+        ))}
+      </ProductList>
+    );
+  }
 }
+
+export default connect()(Home);
