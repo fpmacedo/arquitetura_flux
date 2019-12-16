@@ -64,6 +64,7 @@ const mapStateToProps = state => ({
   }, {}),
 });
 
+// serve para poder chamar as actions sem o dispatch
 const mapDispatchToProps = dispatch =>
   bindActionCreators(CartActions, dispatch);
 
